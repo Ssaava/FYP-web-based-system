@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { sensorLocations } from "@/data";
-import { SensorLocationsMap } from "./SensorLocationsMap";
+import { SensorLocationsMap } from "../common/SensorLocationsMap";
 
 export function DashboardSensorLocations() {
   // Count sensors by status

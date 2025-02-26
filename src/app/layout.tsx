@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import { SidebarProvider } from "@/components/SidebarProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import { AlertProvider } from "@/hooks/useAlerts";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -27,9 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AlertProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-          </AlertProvider>
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>
