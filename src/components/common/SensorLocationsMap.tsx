@@ -8,7 +8,7 @@ import { sensorLocations } from "@/data";
 
 interface SensorLocationsMapProps {
   compact?: boolean;
-  selectedSensorId?: number;
+  selectedSensorId?: number | null;
   onSelectSensor?: (sensorId: number) => void;
 }
 
