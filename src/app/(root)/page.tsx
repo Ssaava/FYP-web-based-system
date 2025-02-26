@@ -25,7 +25,7 @@ export default function Home() {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <Button asChild size="lg" className="w-full">
-              <Link href="/dashboard">Login</Link>
+              <Link href="/login">Login</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="w-full">
               <Link href="/register">Create Account</Link>
