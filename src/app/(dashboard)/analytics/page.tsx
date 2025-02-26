@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DateRangePicker } from "@/components/analytics/DateRangePicker";
+import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { QualityTrends } from "@/components/analytics/QualityTrends";
 import { ParameterCorrelation } from "@/components/analytics/ParameterCorrelation";
 import { PredictiveAnalysis } from "@/components/analytics/PredictiveAnalysis";
