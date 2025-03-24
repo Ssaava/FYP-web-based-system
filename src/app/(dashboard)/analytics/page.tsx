@@ -5,9 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DateRangePicker } from "@/components/common/DateRangePicker";
+// import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { QualityTrends } from "@/components/analytics/QualityTrends";
-import { ParameterCorrelation } from "@/components/analytics/ParameterCorrelation";
+// import { ParameterCorrelation } from "@/components/analytics/ParameterCorrelation";
 import { PredictiveAnalysis } from "@/components/analytics/PredictiveAnalysis";
 
 export default function AnalyticsPage() {
@@ -20,9 +20,9 @@ export default function AnalyticsPage() {
             Advanced analysis and predictions of water quality parameters
           </p>
         </div>
-        <DateRangePicker />
+        {/*<DateRangePicker />*/}
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      {/*<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">*/}
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Predictive Analysis</CardTitle>
@@ -34,18 +34,18 @@ export default function AnalyticsPage() {
             <PredictiveAnalysis />
           </CardContent>
         </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Parameter Correlation</CardTitle>
-            <CardDescription>
-              Relationship between different parameters
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ParameterCorrelation />
-          </CardContent>
-        </Card>
-      </div>
+        {/*<Card className="col-span-3">*/}
+        {/*  <CardHeader>*/}
+        {/*    <CardTitle>Parameter Correlation</CardTitle>*/}
+        {/*    <CardDescription>*/}
+        {/*      Relationship between different parameters*/}
+        {/*    </CardDescription>*/}
+        {/*  </CardHeader>*/}
+        {/*  <CardContent>*/}
+        {/*    <ParameterCorrelation />*/}
+        {/*  </CardContent>*/}
+        {/*</Card>*/}
+      {/*</div>*/}
       <Card>
         <CardHeader>
           <CardTitle>Quality Trends</CardTitle>
