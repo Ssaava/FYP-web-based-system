@@ -11,13 +11,13 @@ import {
 } from "recharts";
 
 const data = [
-  { date: "2024-02-21", actual: 7.2, predicted: 7.3 },
-  { date: "2024-02-22", actual: null, predicted: 7.4 },
-  { date: "2024-02-23", actual: null, predicted: 7.2 },
-  { date: "2024-02-24", actual: null, predicted: 7.3 },
-  { date: "2024-02-25", actual: null, predicted: 7.4 },
-  { date: "2024-02-26", actual: null, predicted: 7.3 },
-  { date: "2024-02-27", actual: null, predicted: 7.2 },
+  { date: "2025-02-21", actual: 7.2, predicted: 7.3 },
+  { date: "2025-02-22", actual: null, predicted: 7.4 },
+  { date: "2025-02-23", actual: null, predicted: 7.2 },
+  { date: "2025-02-24", actual: null, predicted: 7.3 },
+  { date: "2025-02-25", actual: null, predicted: 7.4 },
+  { date: "2025-02-26", actual: null, predicted: 7.3 },
+  { date: "2025-02-27", actual: null, predicted: 7.2 },
 ];
 
 export function PredictiveAnalysis() {

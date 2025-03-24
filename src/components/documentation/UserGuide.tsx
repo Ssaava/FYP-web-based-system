@@ -41,18 +41,6 @@ export function UserGuide() {
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-lg font-medium">AI Models</h4>
-        <p className="text-muted-foreground">
-          The AI Models section allows you to work with machine learning models:
-        </p>
-        <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-          <li>Train new models using historical data</li>
-          <li>Evaluate model performance with various metrics</li>
-          <li>Detect anomalies in water quality parameters</li>
-        </ul>
-      </div>
-
-      <div className="space-y-2">
         <h4 className="text-lg font-medium">Potability Assessment</h4>
         <p className="text-muted-foreground">
           The potability page provides AI-powered assessment of water safety:
