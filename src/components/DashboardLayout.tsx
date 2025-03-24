@@ -2,11 +2,12 @@
 import { Header } from "@/components/common/Header";
 import { Sidebar } from "@/components/common/Sidebar";
 import { useSidebar } from "@/components/SidebarProvider";
+import { ReactNode } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const { collapsed } = useSidebar();
 
