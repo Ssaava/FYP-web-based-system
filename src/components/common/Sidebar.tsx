@@ -37,6 +37,12 @@ const routes = [
     color: "text-green-500",
   },
   {
+    label: "Potability",
+    icon: Flask,
+    href: "/potability",
+    color: "text-teal-500",
+  },
+  {
     label: "History",
     icon: History,
     href: "/history",
@@ -48,18 +54,7 @@ const routes = [
     href: "/sensor-locations",
     color: "text-blue-500",
   },
-  {
-    label: "AI Models",
-    icon: Brain,
-    href: "/ai-models",
-    color: "text-purple-500",
-  },
-  {
-    label: "Potability",
-    icon: Flask,
-    href: "/potability",
-    color: "text-teal-500",
-  },
+
   {
     label: "Reports",
     icon: FileText,
