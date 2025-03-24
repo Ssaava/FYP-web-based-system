@@ -20,16 +20,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const potabilityHistory = [
-  { date: "2024-02-21", score: 85, status: "safe" },
-  { date: "2024-02-20", score: 82, status: "safe" },
-  { date: "2024-02-19", score: 78, status: "safe" },
-  { date: "2024-02-18", score: 65, status: "warning" },
-  { date: "2024-02-17", score: 72, status: "warning" },
-  { date: "2024-02-16", score: 80, status: "safe" },
-  { date: "2024-02-15", score: 83, status: "safe" },
-  { date: "2024-02-14", score: 45, status: "unsafe" },
-  { date: "2024-02-13", score: 60, status: "warning" },
-  { date: "2024-02-12", score: 75, status: "safe" },
+  { date: "2025-02-21", score: 85, status: "safe" },
+  { date: "2025-02-20", score: 82, status: "safe" },
+  { date: "2025-02-19", score: 78, status: "safe" },
+  { date: "2025-02-18", score: 65, status: "warning" },
+  { date: "2025-02-17", score: 72, status: "warning" },
+  { date: "2025-02-16", score: 80, status: "safe" },
+  { date: "2025-02-15", score: 83, status: "safe" },
+  { date: "2025-02-14", score: 45, status: "unsafe" },
+  { date: "2025-02-13", score: 60, status: "warning" },
+  { date: "2025-02-12", score: 75, status: "safe" },
 ];
 
 export function PotabilityHistory() {
