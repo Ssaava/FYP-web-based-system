@@ -103,7 +103,7 @@ export function SensorLocationsMap({
       if (!compact) {
         const label = document.createElement("div");
         label.className =
-          "mt-1 px-2 py-1 bg-white dark:bg-gray-800 text-xs font-medium rounded shadow-sm";
+          "mt-1 px-2 py-1 bg-white dark:bg-gray-800 text-xs font-medium rounded shadow-xs";
         label.textContent = sensor.name;
         markerContent.appendChild(label);
       }
