@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
+import { useAuthStore } from "@/store/store";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -37,6 +38,9 @@ export function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
+  const logoutUser = useAuthStore((state) => state.logout);
+
+  // this eventHandler will fetch the data from the server to refresh page
   const handleRefresh = () => {
     setIsRefreshing(true);
     // Simulate refresh
@@ -84,7 +88,7 @@ export function Header() {
           <span className="sr-only">Refresh</span>
         </Button>
       </div>
-
+      <h1 className="font-bold text-lg">Sensor Information</h1>
       <div className="flex items-center gap-2 md:gap-4">
         {/* <div className="relative hidden md:block">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -133,7 +137,9 @@ export function Header() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Help</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <button onClick={logoutUser}>
+              <DropdownMenuItem>Log out</DropdownMenuItem>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
