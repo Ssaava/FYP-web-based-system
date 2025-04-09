@@ -37,6 +37,7 @@ export function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
+  // this eventHandler will fetch the data from the server to refresh page
   const handleRefresh = () => {
     setIsRefreshing(true);
     // Simulate refresh
@@ -84,7 +85,7 @@ export function Header() {
           <span className="sr-only">Refresh</span>
         </Button>
       </div>
-
+      <h1 className="font-bold text-lg">Sensor Information</h1>
       <div className="flex items-center gap-2 md:gap-4">
         {/* <div className="relative hidden md:block">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
