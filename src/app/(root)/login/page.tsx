@@ -15,11 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { toast } from "sonner";
 import { z } from "zod";
 import { LoginSchema } from "@/schema";
+import { useAuthStore } from "@/store/store";
+import { Input } from "@/components/common/Input";
+import { useRouter } from "next/navigation";
 
 const formDataInitials = {
   email: "",
@@ -27,23 +29,46 @@ const formDataInitials = {
 };
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-
   const [formData, setFormData] = useState<z.infer<typeof LoginSchema>>({
     ...formDataInitials,
   });
   const [errors, setErrors] = useState<z.infer<typeof LoginSchema>>({
     ...formDataInitials,
   });
+  const authenticating = useAuthStore((state) => state.authenticating);
+  const loginUser = useAuthStore((state) => state.login);
+  const router = useRouter();
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setIsLoading(true);
+  const handleInputChange = (e: {
+    target: { name: string; value: string };
+  }) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors({ ...formDataInitials });
+  };
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    const validForm = LoginSchema.safeParse(formData);
+    if (validForm.success) {
+      const response: any = loginUser(formData);
+      if (response) {
+        toast.success("User logged in Successfully");
+        setFormData({ ...formDataInitials });
+        router.push("/dashboard");
+      } else {
+        toast.error("An Error Occurred");
+      }
+    } else {
+      const formErrors = Array(validForm.error.errors)[0];
+      formErrors.map((error) => {
+        setErrors((prev) => ({
+          ...prev,
+          [error.path[0]]: error.message,
+        }));
+      });
+    }
+  };
 
   return (
     <Card className="w-full max-w-lg mx-4">
@@ -56,31 +81,40 @@ export default function LoginPage() {
           Enter your email and password to access your account
         </CardDescription>
       </CardHeader>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
             <Input
-              id="email"
-              type="email"
+              label="Email"
+              name="email"
               placeholder="name@example.com"
-              disabled={isLoading}
+              onChange={handleInputChange}
+              value={formData.email}
+              disabled={authenticating}
+              error={errors.email}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" disabled={isLoading} />
+            <Input
+              label="Password"
+              placeholder="password..."
+              type="password"
+              name="password"
+              disabled={authenticating}
+              value={formData.password}
+              onChange={handleInputChange}
+              error={errors.password}
+            />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Link
-            href="/dashboard"
+          <Button
             className="w-full block bg-blue-500 py-2 px-6 text-center rounded-md"
             type="submit"
-            //   disabled={isLoading}
+            // disabled={authenticating}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Link>
+            {authenticating ? "Signing in..." : "Sign in"}
+          </Button>
           <div className="text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/register" className="text-primary hover:underline">

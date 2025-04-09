@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
+import { useAuthStore } from "@/store/store";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -36,6 +37,8 @@ export function Header() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
+
+  const logoutUser = useAuthStore((state) => state.logout);
 
   // this eventHandler will fetch the data from the server to refresh page
   const handleRefresh = () => {
@@ -134,7 +137,9 @@ export function Header() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Help</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <button onClick={logoutUser}>
+              <DropdownMenuItem>Log out</DropdownMenuItem>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

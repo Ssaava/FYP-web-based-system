@@ -17,7 +17,6 @@ export const useAuthSlice: StateCreator<
     console.log(data);
   },
   login: (data: UserLogin) => {
-    console.log(data);
     set({
       token: {
         value: "token",
@@ -28,6 +27,7 @@ export const useAuthSlice: StateCreator<
         name: "John Doe",
       },
     });
+    return true;
   },
   logout: () => {
     set({ user: {}, token: { value: "", expiresAt: 0 }, authenticated: false });
