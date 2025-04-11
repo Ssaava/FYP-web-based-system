@@ -1,44 +1,65 @@
 "use client";
 
+import { useSensorStore } from "@/store/store";
+import { useEffect, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const data = [
-  {
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 450,
-  },
-  {
-    ph: 7.1,
-    temperature: 22,
-    turbidity: 1.1,
-    conductivity: 445,
-  },
-  {
-    ph: 7.3,
-    temperature: 24,
-    turbidity: 1.3,
-    conductivity: 460,
-  },
-  {
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 455,
-  },
-  {
-    ph: 7.4,
-    temperature: 25,
-    turbidity: 1.4,
-    conductivity: 465,
-  },
-];
+// const data = [
+//   {
+//     ph: 7.2,
+//     temperature: 23,
+//     turbidity: 1.2,
+//     conductivity: 450,
+//   },
+//   {
+//     ph: 7.1,
+//     temperature: 22,
+//     turbidity: 1.1,
+//     conductivity: 445,
+//   },
+//   {
+//     ph: 7.3,
+//     temperature: 24,
+//     turbidity: 1.3,
+//     conductivity: 460,
+//   },
+//   {
+//     ph: 7.2,
+//     temperature: 23,
+//     turbidity: 1.2,
+//     conductivity: 455,
+//   },
+//   {
+//     ph: 7.4,
+//     temperature: 25,
+//     turbidity: 1.4,
+//     conductivity: 465,
+//   },
+// ];
 
 export function Overview() {
+  const [chartData, setChartData] = useState<
+    {
+      ph: number;
+      temperature: number;
+      turbidity: number;
+      conductivity: number;
+    }[]
+  >([]);
+  const history = useSensorStore((state) => state.sensor_history);
+
+  useEffect(() => {
+    const formattedData = history.map((entry) => ({
+      ph: entry.ph,
+      temperature: entry.temperature,
+      turbidity: entry.turbidity,
+      conductivity: entry.conductivity,
+    }));
+    setChartData(formattedData);
+  }, [history]);
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <LineChart data={data}>
+      <LineChart data={chartData}>
         <Tooltip
           content={({ active, payload }) => {
             if (active && payload && payload.length) {

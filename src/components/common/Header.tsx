@@ -18,6 +18,7 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuthStore } from "@/store/store";
+import Link from "next/link";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -39,6 +40,7 @@ export function Header() {
   const [notificationCount, setNotificationCount] = useState(3);
 
   const logoutUser = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
 
   // this eventHandler will fetch the data from the server to refresh page
   const handleRefresh = () => {
@@ -125,7 +127,7 @@ export function Header() {
                 <User className="h-4 w-4 text-primary" />
               </div>
               <div className="hidden md:block text-sm font-medium">
-                John Doe
+                {user?.name}
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -133,11 +135,12 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Help</DropdownMenuItem>
+            <Link href="/settings/">
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+            </Link>
+
             <DropdownMenuSeparator />
-            <button onClick={logoutUser}>
+            <button onClick={logoutUser} className="w-full">
               <DropdownMenuItem>Log out</DropdownMenuItem>
             </button>
           </DropdownMenuContent>
