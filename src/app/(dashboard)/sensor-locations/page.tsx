@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import SensorMap from "@/components/sensor-locations/SensorMap";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,17 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -27,8 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { sensorLocations } from "@/data";
-import { SensorLocationsMap } from "@/components/common/SensorLocationsMap";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 
 export default function SensorLocationsPage() {
   const [selectedSensor, setSelectedSensor] = useState<number | null>(null);
@@ -74,7 +74,11 @@ export default function SensorLocationsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <SensorLocationsMap
+            {/* <SensorLocationsMap
+              selectedSensorId={selectedSensor}
+              onSelectSensor={setSelectedSensor}
+            /> */}
+            <SensorMap
               selectedSensorId={selectedSensor}
               onSelectSensor={setSelectedSensor}
             />
@@ -185,8 +189,8 @@ export default function SensorLocationsPage() {
                           <span className="text-muted-foreground">
                             Location:
                           </span>{" "}
-                          {sensor.latitude.toFixed(4)},{" "}
-                          {sensor.longitude.toFixed(4)}
+                          {sensor.position[0].toFixed(4)},{" "}
+                          {sensor.position[1].toFixed(4)}
                         </div>
                       </div>
                     ))
@@ -257,8 +261,8 @@ export default function SensorLocationsPage() {
                   >
                     <TableCell className="font-medium">{sensor.name}</TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      {sensor.latitude.toFixed(4)},{" "}
-                      {sensor.longitude.toFixed(4)}
+                      {sensor.position[0].toFixed(4)},{" "}
+                      {sensor.position[1].toFixed(4)}
                     </TableCell>
                     <TableCell>
                       <Badge

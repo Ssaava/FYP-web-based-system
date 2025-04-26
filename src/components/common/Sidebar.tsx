@@ -1,27 +1,26 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Droplets,
-  BarChart3,
-  FileText,
-  Bell,
-  Settings,
-  Brain,
-  FlaskRoundIcon as Flask,
-  BookOpen,
-  History,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSidebar } from "../SidebarProvider";
 import useWindowSize from "@/hooks/useWindowSize";
+import { cn } from "@/lib/utils";
+import {
+  BarChart3,
+  Bell,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Droplets,
+  FileText,
+  FlaskRoundIcon as Flask,
+  History,
+  MapPin,
+  Settings
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { useSidebar } from "../SidebarProvider";
 
 const routes = [
   {

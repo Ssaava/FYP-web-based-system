@@ -12,6 +12,7 @@ import { Overview } from "@/components/dashboard/Overview";
 import { RecentReadings } from "@/components/dashboard/RecentReadings";
 import { WaterQualityStatus } from "@/components/dashboard/WaterQualityStatus";
 import { DashboardSensorLocations } from "@/components/dashboard/DashboardSensorLocations";
+import { useSensorStore } from "@/store/store";
 
 export default function DashboardPage() {
   // const { showAlert } = useAlerts();
@@ -56,6 +57,7 @@ export default function DashboardPage() {
 
   //   return () => clearTimeout(timer);
   // }, []);
+  const sensorReading = useSensorStore((state) => state.sensor_reading);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -65,7 +67,7 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">pH Level</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7.2</div>
+            <div className="text-2xl font-bold">{sensorReading.ph}</div>
             <p className="text-xs text-muted-foreground">
               Normal range: 6.5-8.5
             </p>
@@ -76,7 +78,9 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Temperature</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23°C</div>
+            <div className="text-2xl font-bold">
+              {sensorReading.temperature}°C
+            </div>
             <p className="text-xs text-muted-foreground">
               +2.1% from last hour
             </p>
@@ -87,7 +91,9 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Turbidity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1.2 NTU</div>
+            <div className="text-2xl font-bold">
+              {sensorReading.turbidity} NTU
+            </div>
             <p className="text-xs text-muted-foreground">Within safe limits</p>
           </CardContent>
         </Card>
@@ -96,7 +102,9 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Conductivity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">450 µS/cm</div>
+            <div className="text-2xl font-bold">
+              {sensorReading.conductivity} µS/cm
+            </div>
             <p className="text-xs text-muted-foreground">Normal range</p>
           </CardContent>
         </Card>

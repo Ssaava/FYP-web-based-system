@@ -24,7 +24,7 @@ export const useAuthSlice: StateCreator<
       },
       authenticated: true,
       user: {
-        name: "John Doe",
+        name: "John Does",
       },
     });
     return true;

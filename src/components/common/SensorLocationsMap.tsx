@@ -78,8 +78,8 @@ export function SensorLocationsMap({
 
       // Position markers based on latitude and longitude
       // This is a simplified positioning - in a real app, you'd use proper map coordinates
-      const left = ((sensor.longitude + 74.02) / 0.05) * 100; // Simplified calculation
-      const top = ((40.73 - sensor.latitude) / 0.05) * 100; // Simplified calculation
+      const left = ((sensor.position[0] + 74.02) / 0.05) * 100; // Simplified calculation
+      const top = ((40.73 - sensor.position[1]) / 0.05) * 100; // Simplified calculation
 
       marker.style.left = `${left}%`;
       marker.style.top = `${top}%`;
