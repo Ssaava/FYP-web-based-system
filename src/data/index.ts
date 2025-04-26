@@ -29,7 +29,7 @@ export const sensorLocations: SensorLocation[] = [
   {
     id: 2,
     name: "Treatment Plant",
-    position: [0.533196, 31.563495],
+    position: [0.331501, 32.562316],
     status: "warning",
     lastReading: "2024-02-21 12:25:00",
     parameters: {

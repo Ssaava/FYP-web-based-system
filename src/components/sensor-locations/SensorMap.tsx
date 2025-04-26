@@ -20,15 +20,21 @@ interface SensorLocationsMapProps {
   selectedSensorId?: number | null;
   onSelectSensor?: (sensorId: number) => void;
 }
-// Sample sensor locations (replace with your data)
-//   const sensorLocations = [
-//     {
-//       id: 1,
-//       name: "Sensor A",
-//       position: [0.333674, 32.563606],
-//       status: "Active",
-//     },
-//   ];
+const createCustomMarker = (status: string) => {
+  const iconColor =
+    status === "normal" ? "green" : status === "warning" ? "orange" : "red";
+
+  return new L.Icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowUrl:
+      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    shadowSize: [41, 41],
+  });
+};
+
 const SensorMap = ({
   compact = false,
   selectedSensorId,
@@ -64,6 +70,7 @@ const SensorMap = ({
               <Marker
                 key={sensor.id}
                 position={sensor.position}
+                icon={createCustomMarker(sensor.status)}
                 eventHandlers={{
                   click: () => {
                     setSelectedSensor(sensor.id);
