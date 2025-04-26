@@ -1,9 +1,22 @@
-export const sensorLocations = [
+export type SensorLocation = {
+  id: number;
+  name: string;
+  position: [number, number];
+  status: "normal" | "warning" | "error";
+  lastReading: string;
+  parameters: {
+    ph: number;
+    temperature: number;
+    turbidity: number;
+    conductivity: number;
+  };
+};
+
+export const sensorLocations: SensorLocation[] = [
   {
     id: 1,
     name: "Main Reservoir",
-    latitude: 40.7128,
-    longitude: -74.006,
+    position: [0.333196, 32.563495],
     status: "normal",
     lastReading: "2024-02-21 12:30:00",
     parameters: {
@@ -16,8 +29,7 @@ export const sensorLocations = [
   {
     id: 2,
     name: "Treatment Plant",
-    latitude: 40.7282,
-    longitude: -73.9942,
+    position: [0.533196, 31.563495],
     status: "warning",
     lastReading: "2024-02-21 12:25:00",
     parameters: {
@@ -25,48 +37,6 @@ export const sensorLocations = [
       temperature: 25,
       turbidity: 1.5,
       conductivity: 470,
-    },
-  },
-  {
-    id: 3,
-    name: "Distribution Node A",
-    latitude: 40.7112,
-    longitude: -74.0118,
-    status: "normal",
-    lastReading: "2024-02-21 12:20:00",
-    parameters: {
-      ph: 7.1,
-      temperature: 22,
-      turbidity: 1.1,
-      conductivity: 445,
-    },
-  },
-  {
-    id: 4,
-    name: "Community Well",
-    latitude: 40.7218,
-    longitude: -73.9888,
-    status: "normal",
-    lastReading: "2024-02-21 12:15:00",
-    parameters: {
-      ph: 7.3,
-      temperature: 21,
-      turbidity: 1.0,
-      conductivity: 440,
-    },
-  },
-  {
-    id: 5,
-    name: "River Monitoring Station",
-    latitude: 40.7023,
-    longitude: -74.0164,
-    status: "error",
-    lastReading: "2024-02-21 12:10:00",
-    parameters: {
-      ph: 6.2,
-      temperature: 26,
-      turbidity: 5.4,
-      conductivity: 520,
     },
   },
 ];
