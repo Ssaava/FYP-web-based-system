@@ -80,15 +80,17 @@ const SensorMap = ({
                   },
                 }}
               >
-                <Popup className="cutom">
+                <Popup>
                   {selectedSensor && !compact && (
-                    <div className="min-w-[250px] bg-background border rounded-lg p-3 shadow-lg max-h-[150px] overflow-y-auto">
+                    <div className="min-w-[280px] bg-background border rounded-lg p-3 shadow-lg max-h-[150px] overflow-y-auto">
                       {sensorLocations.map(
                         (sensor) =>
                           sensor.id === selectedSensor && (
                             <div key={sensor.id} className="space-y-2">
                               <div className="flex items-center justify-between">
-                                <h3 className="font-medium">{sensor.name}</h3>
+                                <h3 className="font-medium text-foreground">
+                                  {sensor.name}
+                                </h3>
                                 <Badge
                                   className={
                                     sensor.status === "normal"
@@ -111,29 +113,29 @@ const SensorMap = ({
                                     sensor.status.slice(1)}
                                 </Badge>
                               </div>
-                              <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="grid grid-cols-2 gap-2 text-sm text-foreground">
                                 <div>
                                   <span className="text-muted-foreground">
                                     pH:
-                                  </span>
+                                  </span>{" "}
                                   {sensor.parameters.ph}
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground">
                                     Temp:
-                                  </span>
+                                  </span>{" "}
                                   {sensor.parameters.temperature}°C
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground">
                                     Turbidity:
-                                  </span>
+                                  </span>{" "}
                                   {sensor.parameters.turbidity} NTU
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground">
                                     Conductivity:
-                                  </span>
+                                  </span>{" "}
                                   {sensor.parameters.conductivity} µS/cm
                                 </div>
                               </div>
