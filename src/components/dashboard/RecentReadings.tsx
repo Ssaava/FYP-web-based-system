@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useSensorStore } from "@/store/store";
 
 // Assuming ProcessedReading is imported from a shared types file or DashboardPage
 // For this example, let's define it if not imported.

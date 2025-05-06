@@ -12,6 +12,7 @@ import { Overview } from "@/components/dashboard/Overview";
 import { RecentReadings } from "@/components/dashboard/RecentReadings";
 import { WaterQualityStatus } from "@/components/dashboard/WaterQualityStatus";
 import { DashboardSensorLocations } from "@/components/dashboard/DashboardSensorLocations";
+import { useSensorStore } from "@/store/store";
 
 // Interface for the raw API response data (matches the new ML model endpoint)
 interface ApiReading {
@@ -62,6 +63,7 @@ export default function DashboardPage() {
         }
         const data: ApiReading[] = await response.json();
 
+<<<<<<< HEAD
         const processedData: ProcessedReading[] = data.map(item => ({
           ph: item.ph,
           temperature: item.temperature,
@@ -100,6 +102,11 @@ export default function DashboardPage() {
   if (error && allReadings.length === 0) {
     return <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 text-center text-red-500">Error loading data: {error}. Please ensure the API is running.</div>;
   }
+=======
+  //   return () => clearTimeout(timer);
+  // }, []);
+  const sensorReading = useSensorStore((state) => state.sensor_reading);
+>>>>>>> 31754c4fa3bb972ffa3a91771b9a69d593fb3210
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -115,9 +122,13 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">pH Level</CardTitle>
           </CardHeader>
           <CardContent>
+<<<<<<< HEAD
             <div className="text-2xl font-bold">
               {latestReading ? latestReading.ph.toFixed(1) : "N/A"}
             </div>
+=======
+            <div className="text-2xl font-bold">{sensorReading.ph}</div>
+>>>>>>> 31754c4fa3bb972ffa3a91771b9a69d593fb3210
             <p className="text-xs text-muted-foreground">
               Normal range: 6.5-8.5
             </p>
@@ -129,7 +140,11 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
+<<<<<<< HEAD
               {latestReading ? `${latestReading.temperature.toFixed(1)}°C` : "N/A"}
+=======
+              {sensorReading.temperature}°C
+>>>>>>> 31754c4fa3bb972ffa3a91771b9a69d593fb3210
             </div>
             <p className="text-xs text-muted-foreground">
               Current reading
@@ -142,9 +157,15 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
+<<<<<<< HEAD
               {latestReading ? `${latestReading.turbidity.toFixed(2)} NTU` : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Target: &lt; 5 NTU</p>
+=======
+              {sensorReading.turbidity} NTU
+            </div>
+            <p className="text-xs text-muted-foreground">Within safe limits</p>
+>>>>>>> 31754c4fa3bb972ffa3a91771b9a69d593fb3210
           </CardContent>
         </Card>
         <Card className="col-span-1">
@@ -153,9 +174,15 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
+<<<<<<< HEAD
               {latestReading ? `${latestReading.conductivity.toFixed(0)} µS/cm` : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Target: &lt; 500 µS/cm</p>
+=======
+              {sensorReading.conductivity} µS/cm
+            </div>
+            <p className="text-xs text-muted-foreground">Normal range</p>
+>>>>>>> 31754c4fa3bb972ffa3a91771b9a69d593fb3210
           </CardContent>
         </Card>
       </div>

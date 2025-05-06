@@ -1,3 +1,5 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,12 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { sensorLocations } from "@/data";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { sensorLocations } from "@/data";
-import { SensorLocationsMap } from "../common/SensorLocationsMap";
+import SensorMap from "../sensor-locations/SensorMap";
 
 export function DashboardSensorLocations() {
   // Count sensors by status
@@ -40,7 +40,7 @@ export function DashboardSensorLocations() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <SensorLocationsMap compact />
+          <SensorMap compact />
 
           <div className="flex items-center justify-between">
             <div className="grid grid-cols-3 gap-4 w-full">
