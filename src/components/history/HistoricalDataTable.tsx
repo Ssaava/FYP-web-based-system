@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -11,135 +11,100 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
   Download,
+  Search,
 } from "lucide-react";
+import { ProcessedReading } from "@/components/history/types"; // Adjust path
+import { saveAs } from 'file-saver'; // For CSV export
 
-// Sample historical data for the table
-const historicalTableData = [
-  {
-    id: 1,
-    timestamp: "2024-02-21 12:30:00",
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 450,
-    status: "Normal",
-  },
-  {
-    id: 2,
-    timestamp: "2024-02-21 12:00:00",
-    ph: 7.1,
-    temperature: 22,
-    turbidity: 1.1,
-    conductivity: 445,
-    status: "Normal",
-  },
-  {
-    id: 3,
-    timestamp: "2024-02-21 11:30:00",
-    ph: 7.3,
-    temperature: 24,
-    turbidity: 1.3,
-    conductivity: 460,
-    status: "Normal",
-  },
-  {
-    id: 4,
-    timestamp: "2024-02-21 11:00:00",
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 455,
-    status: "Normal",
-  },
-  {
-    id: 5,
-    timestamp: "2024-02-21 10:30:00",
-    ph: 7.4,
-    temperature: 25,
-    turbidity: 1.4,
-    conductivity: 465,
-    status: "Normal",
-  },
-  {
-    id: 6,
-    timestamp: "2024-02-21 10:00:00",
-    ph: 7.0,
-    temperature: 21,
-    turbidity: 1.0,
-    conductivity: 440,
-    status: "Normal",
-  },
-  {
-    id: 7,
-    timestamp: "2024-02-21 09:30:00",
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 450,
-    status: "Normal",
-  },
-  {
-    id: 8,
-    timestamp: "2024-02-21 09:00:00",
-    ph: 7.1,
-    temperature: 22,
-    turbidity: 1.1,
-    conductivity: 445,
-    status: "Normal",
-  },
-  {
-    id: 9,
-    timestamp: "2024-02-21 08:30:00",
-    ph: 7.3,
-    temperature: 24,
-    turbidity: 1.3,
-    conductivity: 460,
-    status: "Normal",
-  },
-  {
-    id: 10,
-    timestamp: "2024-02-21 08:00:00",
-    ph: 7.2,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 455,
-    status: "Normal",
-  },
-];
+interface HistoricalDataTableProps {
+  allReadings: ProcessedReading[];
+}
 
-export function HistoricalDataTable() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+const ITEMS_PER_PAGE = 10;
 
-  const totalPages = 5; // Simulated total pages
+export function HistoricalDataTable({ allReadings }: HistoricalDataTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter data based on search term
-  const filteredData = historicalTableData.filter(
-    (item) =>
-      item.timestamp.includes(search) ||
-      item.status.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredAndSortedData = useMemo(() => {
+    let data = [...allReadings].sort((a, b) => b.timestampMs - a.timestampMs); // Show most recent first
+
+    if (searchTerm) {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      data = data.filter(
+        (item) =>
+          new Date(item.timestampMs).toLocaleString().toLowerCase().includes(lowerSearchTerm) ||
+          item.status.toLowerCase().includes(lowerSearchTerm) ||
+          item.ph.toString().includes(lowerSearchTerm) ||
+          item.temperature.toString().includes(lowerSearchTerm) ||
+          item.turbidity.toString().includes(lowerSearchTerm) ||
+          item.conductivity.toString().includes(lowerSearchTerm)
+      );
+    }
+    return data;
+  }, [allReadings, searchTerm]);
+
+  const totalItems = filteredAndSortedData.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedData.slice(startIndex, endIndex);
+  }, [filteredAndSortedData, currentPage]);
+
+  const handleExportCSV = () => {
+    if (filteredAndSortedData.length === 0) return;
+
+    const header = ["Timestamp", "pH", "Temperature_C", "Turbidity_NTU", "Conductivity_uS_cm", "Potability_Status\n"];
+    const csvRows = [header.join(",")];
+
+    filteredAndSortedData.forEach(row => {
+      const values = [
+        `"${new Date(row.timestampMs).toISOString()}"`, // ISO string for universal format
+        row.ph,
+        row.temperature,
+        row.turbidity,
+        row.conductivity,
+        `"${row.status}"`
+      ];
+      csvRows.push(values.join(","));
+    });
+    
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, `historical_water_data_${new Date().toISOString().split('T')[0]}.csv`);
+  };
+  
+  if (!allReadings || allReadings.length === 0) {
+    return <p className="text-center p-6 text-muted-foreground">No detailed records available.</p>;
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-auto">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by date or status..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-[300px]"
+            placeholder="Search records..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page on search
+            }}
+            className="pl-8 w-full sm:w-[300px] h-9"
           />
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredAndSortedData.length === 0}>
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          Export Filtered CSV
         </Button>
       </div>
 
@@ -147,74 +112,93 @@ export function HistoricalDataTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Timestamp</TableHead>
-              <TableHead>pH Level</TableHead>
-              <TableHead>Temperature (°C)</TableHead>
+              <TableHead className="w-[200px]">Timestamp</TableHead>
+              <TableHead>pH</TableHead>
+              <TableHead>Temp (°C)</TableHead>
               <TableHead>Turbidity (NTU)</TableHead>
-              <TableHead>Conductivity (µS/cm)</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Conduct. (µS/cm)</TableHead>
+              <TableHead>Potability</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.map((reading) => (
+            {paginatedData.length > 0 ? paginatedData.map((reading) => (
               <TableRow key={reading.id}>
-                <TableCell>{reading.timestamp}</TableCell>
-                <TableCell>{reading.ph}</TableCell>
-                <TableCell>{reading.temperature}</TableCell>
-                <TableCell>{reading.turbidity}</TableCell>
-                <TableCell>{reading.conductivity}</TableCell>
+                <TableCell className="font-medium">{new Date(reading.timestampMs).toLocaleString()}</TableCell>
+                <TableCell>{reading.ph.toFixed(1)}</TableCell>
+                <TableCell>{reading.temperature.toFixed(1)}</TableCell>
+                <TableCell>{reading.turbidity.toFixed(2)}</TableCell>
+                <TableCell>{reading.conductivity.toFixed(0)}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">
+                  <Badge
+                    variant={reading.potability === 1 ? "default" : "destructive"}
+                    className={
+                      reading.potability === 1
+                        ? "bg-green-100 text-green-800 hover:bg-green-200"
+                        : "bg-red-100 text-red-800 hover:bg-red-200"
+                    }
+                  >
                     {reading.status}
-                  </span>
+                  </Badge>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center">
+                  No results found for your search.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing <span className="font-medium">1</span> to{" "}
-          <span className="font-medium">10</span> of{" "}
-          <span className="font-medium">50</span> results
+    {totalPages > 1 && (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-xs sm:text-sm text-muted-foreground">
+          Page <span className="font-medium">{currentPage}</span> of <span className="font-medium">{totalPages}</span> ({totalItems} total records)
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setPage(1)}
-            disabled={page === 1}
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="h-8 w-8"
           >
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="h-8 w-8"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
+          {/* Optional: Page number input or more sophisticated pagination */}
+          <span className="text-sm p-2">Page {currentPage}</span>
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="h-8 w-8"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setPage(totalPages)}
-            disabled={page === totalPages}
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="h-8 w-8"
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
+    )}
     </div>
   );
 }

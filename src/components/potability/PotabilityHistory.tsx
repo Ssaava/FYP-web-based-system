@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import {
   Table,
@@ -18,60 +19,78 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { PotabilityHistoryEntry } from "@/components/potability/types"; // Adjust path if types are elsewhere
 
-const potabilityHistory = [
-  { date: "2025-02-21", score: 85, status: "safe" },
-  { date: "2025-02-20", score: 82, status: "safe" },
-  { date: "2025-02-19", score: 78, status: "safe" },
-  { date: "2025-02-18", score: 65, status: "warning" },
-  { date: "2025-02-17", score: 72, status: "warning" },
-  { date: "2025-02-16", score: 80, status: "safe" },
-  { date: "2025-02-15", score: 83, status: "safe" },
-  { date: "2025-02-14", score: 45, status: "unsafe" },
-  { date: "2025-02-13", score: 60, status: "warning" },
-  { date: "2025-02-12", score: 75, status: "safe" },
-];
+interface PotabilityHistoryProps {
+  data: PotabilityHistoryEntry[];
+}
 
-export function PotabilityHistory() {
+export function PotabilityHistory({ data }: PotabilityHistoryProps) {
+  if (!data || data.length === 0) {
+    return <p className="text-center p-6 text-muted-foreground">No potability history available.</p>;
+  }
+
+  // Reverse data for chart so oldest is first (Recharts preference)
+  const chartData = [...data].reverse(); 
+  // For table, show most recent first (already sorted this way from page)
+  const tableData = data.slice(0, 7); // Show latest 7 records in table
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h3 className="text-lg font-medium">Potability Trend</h3>
+    <div className="space-y-8"> {/* Increased spacing */}
+      <div>
+        <h3 className="text-lg font-medium">Potability Prediction Trend</h3>
         <p className="text-sm text-muted-foreground">
-          Historical water potability scores over time
+          Individual AI potability predictions over time (0% = Not Potable, 100% = Potable)
         </p>
       </div>
 
-      <div className="h-[300px]">
+      <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={potabilityHistory}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis domain={[0, 100]} />
-            <Tooltip
-              formatter={(value, name) => [`${value}%`, "Potability Score"]}
-              labelFormatter={(label) => `Date: ${label}`}
+          <LineChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              fontSize={10} 
+              tickLine={false} 
+              axisLine={true}
+              interval={chartData.length > 10 ? Math.floor(chartData.length / 6) : 0}
             />
+            <YAxis 
+              domain={[0, 100]} 
+              ticks={[0, 25, 50, 75, 100]} 
+              tickFormatter={(value) => `${value}%`}
+              fontSize={10}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              formatter={(value: number, name, props) => {
+                const statusText = props.payload.status === "safe" ? "Potable" : "Not Potable";
+                return [`${value}% (${statusText})`, "Prediction"];
+              }}
+              labelFormatter={(label) => `Date: ${label}`} // label is the 'date' string
+              contentStyle={{
+                backgroundColor: "hsl(var(--background))",
+                borderColor: "hsl(var(--border))"
+              }}
+            />
+            <Legend verticalAlign="top" height={36}/>
             <Line
-              type="monotone"
+              type="stepAfter" // 'stepAfter' can be good for binary predictions
               dataKey="score"
-              stroke="#3b82f6"
+              name="Potability Prediction"
+              stroke="hsl(var(--primary))"
               strokeWidth={2}
               dot={(props) => {
                 const { cx, cy, payload } = props;
-                let fill = "#22c55e";
-                if (payload.status === "warning") fill = "#eab308";
-                if (payload.status === "unsafe") fill = "#ef4444";
-
+                // payload here is one item from chartData
+                if (!payload || payload.score === undefined) {
+                  return <circle cx={0} cy={0} r={0} fill="transparent" />;
+                }
+                
+                const fill = payload.status === "safe" ? "hsl(var(--success))" : "hsl(var(--destructive))";
                 return (
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={5}
-                    fill={fill}
-                    stroke="white"
-                    strokeWidth={1}
-                  />
+                  <circle cx={cx} cy={cy} r={4} fill={fill} stroke="hsl(var(--background))" strokeWidth={1}/>
                 );
               }}
             />
@@ -79,39 +98,39 @@ export function PotabilityHistory() {
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Potability Score</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {potabilityHistory.slice(0, 5).map((record, index) => (
-              <TableRow key={index}>
-                <TableCell>{record.date}</TableCell>
-                <TableCell>{record.score}%</TableCell>
-                <TableCell>
-                  <Badge
-                    className={
-                      record.status === "safe"
-                        ? "bg-green-100 text-green-800 hover:bg-green-100"
-                        : record.status === "warning"
-                        ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                        : "bg-red-100 text-red-800 hover:bg-red-100"
-                    }
-                  >
-                    {record.status === "safe" && "Safe"}
-                    {record.status === "warning" && "Caution"}
-                    {record.status === "unsafe" && "Unsafe"}
-                  </Badge>
-                </TableCell>
+      <div>
+        <h3 className="text-lg font-medium mb-2">Recent Predictions</h3>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[150px]">Date</TableHead>
+                <TableHead>AI Prediction</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {tableData.map((record) => (
+                <TableRow key={record.timestamp}>
+                  <TableCell className="font-medium">{record.date}</TableCell>
+                  <TableCell>{record.score}%</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={record.status === "safe" ? "default" : "destructive"}
+                      className={
+                        record.status === "safe"
+                          ? "bg-green-100 text-green-800 hover:bg-green-200" // Custom more visible styles
+                          : "bg-red-100 text-red-800 hover:bg-red-200"
+                      }
+                    >
+                      {record.status === "safe" ? "Potable" : "Not Potable"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

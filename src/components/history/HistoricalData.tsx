@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Line,
   LineChart,
@@ -18,72 +18,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ProcessedReading } from "@/components/history/types"; // Adjust path
 
-// Sample historical data
-const historicalData = [
-  {
-    date: "2024-01-01",
-    ph: 7.2,
-    temperature: 22,
-    turbidity: 1.1,
-    conductivity: 440,
-  },
-  {
-    date: "2024-01-08",
-    ph: 7.3,
-    temperature: 23,
-    turbidity: 1.2,
-    conductivity: 445,
-  },
-  {
-    date: "2024-01-15",
-    ph: 7.1,
-    temperature: 21,
-    turbidity: 1.3,
-    conductivity: 450,
-  },
-  {
-    date: "2024-01-22",
-    ph: 7.4,
-    temperature: 24,
-    turbidity: 1.0,
-    conductivity: 455,
-  },
-  {
-    date: "2024-01-29",
-    ph: 7.2,
-    temperature: 22,
-    turbidity: 1.2,
-    conductivity: 460,
-  },
-  {
-    date: "2024-02-05",
-    ph: 7.0,
-    temperature: 21,
-    turbidity: 1.4,
-    conductivity: 465,
-  },
-  {
-    date: "2024-02-12",
-    ph: 7.3,
-    temperature: 23,
-    turbidity: 1.1,
-    conductivity: 470,
-  },
-  {
-    date: "2024-02-19",
-    ph: 7.2,
-    temperature: 22,
-    turbidity: 1.2,
-    conductivity: 450,
-  },
-];
+interface HistoricalDataProps {
+  allReadings: ProcessedReading[];
+}
 
-export function HistoricalData() {
-  const [timeframe, setTimeframe] = useState("weekly");
+// Helper to format date for XAxis based on timeframe (simplified)
+const formatDateForXAxis = (isoDateString: string, timeframe: string) => {
+  const date = new Date(isoDateString);
+  switch (timeframe) {
+    case "daily": // Assuming raw data points might be frequent, show time
+      return date.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+    case "weekly":
+    case "monthly":
+    case "quarterly": // For aggregated views, just the date part
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    default: // Default for raw data
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+};
+
+export function HistoricalData({ allReadings }: HistoricalDataProps) {
+  const [timeframe, setTimeframe] = useState("all"); // 'all' means plot raw available data
   const [parameter, setParameter] = useState("all");
 
-  // Function to determine which parameters to display based on selection
+  const chartData = useMemo(() => {
+    // TODO: Implement actual aggregation for 'daily', 'weekly', 'monthly', 'quarterly'
+    // For now, 'all' will plot a subset of raw data to avoid too many points.
+    // Other selections will be empty until aggregation is built.
+    let dataToDisplay = allReadings;
+
+    if (timeframe !== "all") {
+      // Placeholder: In a real app, you'd filter and aggregate `allReadings`
+      // based on the selected `timeframe`.
+      // e.g., for 'weekly', group by week and average parameters.
+      console.warn(`Timeframe aggregation for '${timeframe}' is not yet implemented. Showing all data.`);
+      // return []; // Or show all data as a fallback
+    }
+    
+    // To prevent chart lag with too many points if 'all' is selected with raw data
+    if (dataToDisplay.length > 200) { // Arbitrary limit
+        const step = Math.floor(dataToDisplay.length / 200);
+        dataToDisplay = dataToDisplay.filter((_, index) => index % step === 0);
+    }
+
+
+    return dataToDisplay.map(r => ({
+      ...r,
+      // Use a more specific date format if data is very granular
+      date: new Date(r.timestampMs).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}),
+    }));
+  }, [allReadings, timeframe]);
+
   const getVisibleParameters = () => {
     if (parameter === "all") {
       return ["ph", "temperature", "turbidity", "conductivity"];
@@ -93,14 +80,17 @@ export function HistoricalData() {
 
   const visibleParameters = getVisibleParameters();
 
+  if (!allReadings || allReadings.length === 0) {
+    return <p className="text-center p-6 text-muted-foreground">No historical data to display.</p>;
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-4"> {/* Changed to flex-wrap */}
           <div className="flex items-center gap-2">
-            <span className="text-sm">Parameter:</span>
+            <span className="text-sm font-medium">Parameter:</span>
             <Select value={parameter} onValueChange={setParameter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[180px] h-9">
                 <SelectValue placeholder="Select parameter" />
               </SelectTrigger>
               <SelectContent>
@@ -113,75 +103,64 @@ export function HistoricalData() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm">Timeframe:</span>
+            <span className="text-sm font-medium">Timeframe:</span>
             <Select value={timeframe} onValueChange={setTimeframe}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[180px] h-9">
                 <SelectValue placeholder="Select timeframe" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="quarterly">Quarterly</SelectItem>
+                <SelectItem value="all">All Available Data</SelectItem>
+                {/* Add actual aggregation options later */}
+                <SelectItem value="daily" disabled>Daily Average (TODO)</SelectItem>
+                <SelectItem value="weekly" disabled>Weekly Average (TODO)</SelectItem>
+                <SelectItem value="monthly" disabled>Monthly Average (TODO)</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={historicalData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {visibleParameters.includes("ph") && (
-            <Line
-              type="monotone"
-              dataKey="ph"
-              name="pH Level"
-              stroke="#0667CF"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+      {chartData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.5}/>
+            <XAxis 
+              dataKey="date" 
+              fontSize={10}
+              tickLine={false}
+              axisLine={true}
+              // interval="preserveStartEnd" // or other interval logic
             />
-          )}
-          {visibleParameters.includes("temperature") && (
-            <Line
-              type="monotone"
-              dataKey="temperature"
-              name="Temperature (°C)"
-              stroke="#dc2626"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+            <YAxis fontSize={10} axisLine={false} tickLine={false}/>
+            <Tooltip 
+              contentStyle={{ backgroundColor: "hsl(var(--background))", borderColor: "hsl(var(--border))"}}
+              formatter={(value: number, name: string) => {
+                let unit = "";
+                if (name.toLowerCase().includes("temperature")) unit = "°C";
+                else if (name.toLowerCase().includes("turbidity")) unit = " NTU";
+                else if (name.toLowerCase().includes("conductivity")) unit = " µS/cm";
+                return [`${typeof value === 'number' ? value.toFixed(2) : value}${unit}`, name];
+              }}
             />
-          )}
-          {visibleParameters.includes("turbidity") && (
-            <Line
-              type="monotone"
-              dataKey="turbidity"
-              name="Turbidity (NTU)"
-              stroke="#ca8a04"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          )}
-          {visibleParameters.includes("conductivity") && (
-            <Line
-              type="monotone"
-              dataKey="conductivity"
-              name="Conductivity (µS/cm)"
-              stroke="#059669"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          )}
-        </LineChart>
-      </ResponsiveContainer>
+            <Legend />
+            {visibleParameters.includes("ph") && (
+              <Line type="monotone" dataKey="ph" name="pH" stroke="#3b82f6" strokeWidth={2} dot={false} />
+            )}
+            {visibleParameters.includes("temperature") && (
+              <Line type="monotone" dataKey="temperature" name="Temperature" stroke="#ef4444" strokeWidth={2} dot={false} />
+            )}
+            {visibleParameters.includes("turbidity") && (
+              <Line type="monotone" dataKey="turbidity" name="Turbidity" stroke="#f59e0b" strokeWidth={2} dot={false} />
+            )}
+            {visibleParameters.includes("conductivity") && (
+              <Line type="monotone" dataKey="conductivity" name="Conductivity" stroke="#10b981" strokeWidth={2} dot={false} />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <p className="text-center p-6 text-muted-foreground">
+          No data available for the selected timeframe/parameter. Aggregation for selected timeframe might not be implemented.
+        </p>
+      )}
     </div>
   );
 }

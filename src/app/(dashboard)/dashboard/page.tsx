@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -13,59 +13,111 @@ import { RecentReadings } from "@/components/dashboard/RecentReadings";
 import { WaterQualityStatus } from "@/components/dashboard/WaterQualityStatus";
 import { DashboardSensorLocations } from "@/components/dashboard/DashboardSensorLocations";
 
+// Interface for the raw API response data (matches the new ML model endpoint)
+interface ApiReading {
+  Conductivity: number;
+  Timestamp: string;
+  Turbidity: number;
+  ph: number;
+  predicted_potability: number;
+  temperature: number;
+}
+
+// Interface for the processed data used by components
+// It's good practice to place this in a shared types file (e.g., types/index.ts)
+export interface ProcessedReading {
+  ph: number;
+  temperature: number;
+  turbidity: number;
+  conductivity: number;
+  timestamp: string; // Original timestamp string
+  formattedTimestamp: string; // User-friendly timestamp
+  predictedPotability: number; // 0 for not potable, 1 for potable
+}
+
 export default function DashboardPage() {
-  // const { showAlert } = useAlerts();
+  const [allReadings, setAllReadings] = useState<ProcessedReading[]>([]);
+  const [latestReading, setLatestReading] = useState<ProcessedReading | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate random alerts for demonstration
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     // Randomly show different types of alerts
-  //     const alertTypes = ["warning", "info", "success", "error"] as const;
-  //     const randomType =
-  //       alertTypes[Math.floor(Math.random() * alertTypes.length)];
+  useEffect(() => {
+    const fetchData = async () => {
+      if (allReadings.length === 0) {
+        setLoading(true);
+      }
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  //     const alerts = {
-  //       warning: {
-  //         title: "Turbidity Level Rising",
-  //         description:
-  //           "Turbidity has increased to 4.8 NTU, approaching the upper limit.",
-  //       },
-  //       info: {
-  //         title: "System Update Available",
-  //         description:
-  //           "A new system update is available. Please update at your convenience.",
-  //       },
-  //       success: {
-  //         title: "Water Quality Optimal",
-  //         description:
-  //           "All parameters are within optimal ranges for the past 24 hours.",
-  //       },
-  //       error: {
-  //         title: "Conductivity Sensor Error",
-  //         description:
-  //           "The conductivity sensor is reporting erratic values. Maintenance required.",
-  //       },
-  //     };
+        const response = await fetch(`${baseUrl}/api/ml_model`, {
+          method: 'POST', // Changed to POST
+          headers: {
+            'Content-Type': 'application/json', // Good practice, even if body is empty
+          },
+          // body: JSON.stringify({}), // Send empty JSON object if required, or null/undefined if not
+        });
 
-  //     showAlert(
-  //       randomType,
-  //       alerts[randomType].title,
-  //       alerts[randomType].description
-  //     );
-  //   }, 10000); // Show after 10 seconds
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: ApiReading[] = await response.json();
 
-  //   return () => clearTimeout(timer);
-  // }, []);
+        const processedData: ProcessedReading[] = data.map(item => ({
+          ph: item.ph,
+          temperature: item.temperature,
+          turbidity: item.Turbidity,
+          conductivity: item.Conductivity,
+          timestamp: item.Timestamp,
+          formattedTimestamp: new Date(item.Timestamp).toLocaleString(), // Format for display
+          predictedPotability: item.predicted_potability,
+        })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Sort by timestamp descending
+
+        setAllReadings(processedData);
+        if (processedData.length > 0) {
+          setLatestReading(processedData[0]); // Latest is now the first after sorting
+        } else {
+          setLatestReading(null);
+        }
+        setError(null);
+      } catch (e: any) {
+        console.error("Failed to fetch data:", e);
+        setError(e.message || "Failed to fetch data from ML model endpoint");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData(); // Initial fetch
+    const intervalId = setInterval(fetchData, 20000); // Refresh every 20 seconds
+
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+  }, []); // Removed allReadings.length from dependency to avoid re-fetch loop issues. setLoading handled internally.
+
+  if (loading && allReadings.length === 0) {
+    return <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 text-center">Loading dashboard data...</div>;
+  }
+
+  if (error && allReadings.length === 0) {
+    return <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 text-center text-red-500">Error loading data: {error}. Please ensure the API is running.</div>;
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      {error && allReadings.length > 0 && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
+          Warning: Could not refresh data. Displaying last known values. Error: {error}
+        </div>
+      )}
+      {/* Summary Cards - these use latestReading */}
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">pH Level</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7.2</div>
+            <div className="text-2xl font-bold">
+              {latestReading ? latestReading.ph.toFixed(1) : "N/A"}
+            </div>
             <p className="text-xs text-muted-foreground">
               Normal range: 6.5-8.5
             </p>
@@ -76,9 +128,11 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Temperature</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23°C</div>
+            <div className="text-2xl font-bold">
+              {latestReading ? `${latestReading.temperature.toFixed(1)}°C` : "N/A"}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +2.1% from last hour
+              Current reading
             </p>
           </CardContent>
         </Card>
@@ -87,8 +141,10 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Turbidity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1.2 NTU</div>
-            <p className="text-xs text-muted-foreground">Within safe limits</p>
+            <div className="text-2xl font-bold">
+              {latestReading ? `${latestReading.turbidity.toFixed(2)} NTU` : "N/A"}
+            </div>
+            <p className="text-xs text-muted-foreground">Target: &lt; 5 NTU</p>
           </CardContent>
         </Card>
         <Card className="col-span-1">
@@ -96,18 +152,23 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">Conductivity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">450 µS/cm</div>
-            <p className="text-xs text-muted-foreground">Normal range</p>
+            <div className="text-2xl font-bold">
+              {latestReading ? `${latestReading.conductivity.toFixed(0)} µS/cm` : "N/A"}
+            </div>
+            <p className="text-xs text-muted-foreground">Target: &lt; 500 µS/cm</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Overview Chart and Water Quality Status */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-full lg:col-span-4">
           <CardHeader>
             <CardTitle>Overview</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <Overview />
+            {/* Overview expects all readings, ensure they are sorted chronologically for the chart if needed */}
+            <Overview data={allReadings.slice().sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())} />
           </CardContent>
         </Card>
         <Card className="col-span-full lg:col-span-3">
@@ -118,10 +179,12 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <WaterQualityStatus />
+            <WaterQualityStatus reading={latestReading} />
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Readings Table and Sensor Locations */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="col-span-full md:col-span-1">
           <CardHeader>
@@ -131,7 +194,8 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RecentReadings />
+            {/* RecentReadings gets all readings, sorted by most recent first */}
+            <RecentReadings readings={allReadings} />
           </CardContent>
         </Card>
         <div className="col-span-full md:col-span-1">
