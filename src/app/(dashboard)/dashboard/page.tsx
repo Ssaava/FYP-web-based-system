@@ -11,11 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSocket } from "@/hooks/useSocket";
+import { useSocketContext } from "@/hooks/useSocketContext";
 
 // Interface for the raw API response data (matches the new ML model endpoint)
 export default function DashboardPage() {
-  const { loading, error, allReadings, latestReading } = useSocket();
+  const { loading, error, allReadings, latestReading } = useSocketContext();
 
   if (loading && allReadings.length === 0) {
     return (
@@ -49,7 +49,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {latestReading ? latestReading.ph.toFixed(1) : "N/A"}
+              {latestReading ? latestReading?.ph.toFixed(1) : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
               Normal range: 6.5-8.5
@@ -63,7 +63,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {latestReading
-                ? `${latestReading.temperature.toFixed(1)}°C`
+                ? `${latestReading?.temperature.toFixed(1)}°C`
                 : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Current reading</p>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {latestReading
-                ? `${latestReading.turbidity.toFixed(2)} NTU`
+                ? `${latestReading?.turbidity.toFixed(2)} NTU`
                 : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Target: &lt; 5 NTU</p>

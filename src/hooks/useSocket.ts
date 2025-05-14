@@ -1,34 +1,21 @@
 // hooks/useSocket.ts
+import {
+  ApiResponseData,
+  PotabilityAssessmentData,
+  PotabilityHistoryEntry,
+  ProcessedReading,
+} from "@/types";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL; // Use your Flask server URL here
-
-interface ApiReading {
-  Conductivity: number;
-  Timestamp: string;
-  Turbidity: number;
-  ph: number;
-  predicted_potability: number;
-  temperature: number;
-}
-
-// Interface for the processed data used by components
-// It's good practice to place this in a shared types file (e.g., types/index.ts)
-export interface ProcessedReading {
-  ph: number;
-  temperature: number;
-  turbidity: number;
-  conductivity: number;
-  timestamp: string; // Original timestamp string
-  formattedTimestamp: string; // User-friendly timestamp
-  predictedPotability: number; // 0 for not potable, 1 for potable
-}
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
 export const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-
+  const [historyData, setHistoryData] = useState<PotabilityHistoryEntry[]>([]);
+  const [assessmentData, setAssessmentData] =
+    useState<PotabilityAssessmentData | null>(null);
   const [allReadings, setAllReadings] = useState<ProcessedReading[]>([]);
   const [latestReading, setLatestReading] = useState<ProcessedReading | null>(
     null
@@ -45,42 +32,99 @@ export const useSocket = () => {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
         const response = await fetch(`${baseUrl}/api/ml_model`, {
-          method: "POST", // Changed to POST
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Good practice, even if body is empty
+            "Content-Type": "application/json",
           },
-          // body: JSON.stringify({}), // Send empty JSON object if required, or null/undefined if not
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errData = await response
+            .json()
+            .catch(() => ({ error: "Failed to parse error from /ml_model" }));
+          throw new Error(
+            errData.error ||
+              `Failed to fetch potability data (${response.status})`
+          );
         }
-        const data: ApiReading[] = await response.json();
+        const data: ApiResponseData[] = await response.json();
+        console.log("API DATA: ", data);
+        if (!data || data.length === 0) {
+          setError("No data received from the API.");
+          setLoading(false);
+          return;
+        }
 
-        const processedData: ProcessedReading[] = data
+        const sortedReadings: ProcessedReading[] = data
           .map((item) => ({
             ph: item.ph,
             temperature: item.temperature,
             turbidity: item.Turbidity,
             conductivity: item.Conductivity,
             timestamp: item.Timestamp,
-            formattedTimestamp: new Date(item.Timestamp).toLocaleString(), // Format for display
-            predictedPotability: item.predicted_potability,
+            formatted_timestamp: new Date(item.Timestamp).toLocaleString(), // Format for display
+            predicted_potability: item.predicted_potability,
           }))
           .sort(
             (a, b) =>
               new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
           ); // Sort by timestamp descending
 
-        setAllReadings(processedData);
-        if (processedData.length > 0) {
-          setLatestReading(processedData[0]); // Latest is now the first after sorting
+        const latestReading = sortedReadings[0] || null;
+        // --- Process for PotabilityAssessment ---
+        // Calculate average potability from all readings
+        const potabilityValues = sortedReadings.map(
+          (r) => r.predicted_potability
+        );
+
+        const averagePotability =
+          potabilityValues.reduce((sum, val) => sum + val, 0) /
+          (potabilityValues.length || 1);
+        const potabilityScore = Math.round(averagePotability * 100); // As percentage
+
+        let currentStatus: "safe" | "warning" | "unsafe";
+        if (potabilityScore >= 75) {
+          // Example thresholds
+          currentStatus = "safe";
+        } else if (potabilityScore >= 50) {
+          currentStatus = "warning";
+        } else {
+          currentStatus = "unsafe";
+        }
+
+        setAssessmentData({
+          potabilityScore,
+          status: currentStatus,
+          latestReading: latestReading,
+        });
+
+        const newHistoryData: PotabilityHistoryEntry[] = sortedReadings.map(
+          (reading) => {
+            const readingTimestamp = new Date(reading.timestamp).getTime();
+            return {
+              // Example: "5/7/2025"
+              date: new Date(reading.timestamp).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              }),
+              timestamp: readingTimestamp,
+              score: reading.predicted_potability === 1 ? 100 : 0, // Convert 0/1 to 0/100 for score
+              status: reading.predicted_potability === 1 ? "safe" : "unsafe",
+            };
+          }
+        );
+        setHistoryData(newHistoryData);
+        setAllReadings(sortedReadings);
+        if (sortedReadings.length > 0) {
+          console.log("Latest Reading: ", latestReading);
+          setLatestReading(sortedReadings[0]); // Latest is now the first after sorting
         } else {
           setLatestReading(null);
         }
         setError(null);
       } catch (e: any) {
-        console.error("Failed to fetch data:", e);
+        console.error("Failed to fetch data:", e.message);
         setError(e.message || "Failed to fetch data from ML model endpoint");
       } finally {
         setLoading(false);
@@ -95,13 +139,11 @@ export const useSocket = () => {
     });
 
     socketRef.current.on("new_data", (data) => {
-      console.log("Message from server:", data);
       fetchData();
       setMessages((prev) => [...prev, data]);
     });
 
     socketRef.current.on("response", (data) => {
-      console.log("Response from server:", data);
       fetchData();
       setMessages((prev) => [...prev, data]);
     });
@@ -114,9 +156,15 @@ export const useSocket = () => {
   const sendMessage = (data: any) => {
     socketRef.current?.emit("my_event", data);
   };
-  useEffect(() => {
-    console.log("Latest Reading Updated:", latestReading);
-  }, [latestReading]);
 
-  return { messages, sendMessage, loading, error, allReadings, latestReading };
+  return {
+    messages,
+    sendMessage,
+    loading,
+    error,
+    allReadings,
+    latestReading,
+    historyData,
+    assessmentData,
+  };
 };
