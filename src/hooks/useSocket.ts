@@ -139,12 +139,7 @@ export const useSocket = () => {
     };
   }, []);
 
-  const sendMessage = (data: any) => {
-    socketRef.current?.emit("my_event", data);
-  };
-
   return {
-    sendMessage,
     loading,
     error,
     allReadings,

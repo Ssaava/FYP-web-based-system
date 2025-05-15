@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useMemo } from "react";
 import { useSocket } from "./useSocket";
 import {
   PotabilityAssessmentData,
@@ -10,8 +10,6 @@ import {
 
 // Define the type for the context value
 interface SocketContextType {
-  messages: any[];
-  sendMessage: (data: any) => void;
   loading: boolean;
   error: string | null;
   allReadings: ProcessedReading[];
@@ -26,6 +24,7 @@ const SocketContext = createContext<SocketContextType | undefined>(undefined);
 // Provider component
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const socketData = useSocket();
+  // const socketData = useMemo(() => useSocket(), []);
   return (
     <SocketContext.Provider value={socketData}>
       {children}
