@@ -66,12 +66,6 @@ const routes = [
     href: '/alerts',
     color: 'text-red-500',
   },
-  {
-    label: 'Documentation',
-    icon: BookOpen,
-    href: '/documentation',
-    color: 'text-indigo-500',
-  },
 ];
 interface SidebarProps {
   isMobile?: boolean;
