@@ -60,12 +60,6 @@ const routes = [
     href: '/reports',
     color: 'text-orange-500',
   },
-  {
-    label: 'Alerts',
-    icon: Bell,
-    href: '/alerts',
-    color: 'text-red-500',
-  },
 ];
 interface SidebarProps {
   isMobile?: boolean;
