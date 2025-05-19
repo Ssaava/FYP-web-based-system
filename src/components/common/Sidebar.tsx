@@ -53,13 +53,6 @@ const routes = [
     href: '/sensor-locations',
     color: 'text-blue-500',
   },
-
-  {
-    label: 'Reports',
-    icon: FileText,
-    href: '/reports',
-    color: 'text-orange-500',
-  },
 ];
 interface SidebarProps {
   isMobile?: boolean;
