@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import useWindowSize from "@/hooks/useWindowSize";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import useWindowSize from '@/hooks/useWindowSize';
+import { cn } from '@/lib/utils';
 import {
   BarChart3,
   Bell,
@@ -15,68 +15,62 @@ import {
   FlaskRoundIcon as Flask,
   History,
   MapPin,
-  Settings
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { useSidebar } from "../SidebarProvider";
+  Settings,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { useSidebar } from '../SidebarProvider';
 
 const routes = [
   {
-    label: "Dashboard",
+    label: 'Dashboard',
     icon: Droplets,
-    href: "/dashboard",
-    color: "text-primary",
+    href: '/dashboard',
+    color: 'text-primary',
   },
   {
-    label: "Analytics",
+    label: 'Analytics',
     icon: BarChart3,
-    href: "/analytics",
-    color: "text-green-500",
+    href: '/analytics',
+    color: 'text-green-500',
   },
   {
-    label: "Potability",
+    label: 'Potability',
     icon: Flask,
-    href: "/potability",
-    color: "text-teal-500",
+    href: '/potability',
+    color: 'text-teal-500',
   },
   {
-    label: "History",
+    label: 'History',
     icon: History,
-    href: "/history",
-    color: "text-amber-500",
+    href: '/history',
+    color: 'text-amber-500',
   },
   {
-    label: "Sensor Locations",
+    label: 'Sensor Locations',
     icon: MapPin,
-    href: "/sensor-locations",
-    color: "text-blue-500",
+    href: '/sensor-locations',
+    color: 'text-blue-500',
   },
 
   {
-    label: "Reports",
+    label: 'Reports',
     icon: FileText,
-    href: "/reports",
-    color: "text-orange-500",
+    href: '/reports',
+    color: 'text-orange-500',
   },
   {
-    label: "Alerts",
+    label: 'Alerts',
     icon: Bell,
-    href: "/alerts",
-    color: "text-red-500",
+    href: '/alerts',
+    color: 'text-red-500',
   },
   {
-    label: "Documentation",
+    label: 'Documentation',
     icon: BookOpen,
-    href: "/documentation",
-    color: "text-indigo-500",
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    href: "/settings",
-    color: "text-gray-500",
+    href: '/documentation',
+    color: 'text-indigo-500',
   },
 ];
 interface SidebarProps {
@@ -103,15 +97,15 @@ export function Sidebar({ isMobile = false }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col border-r bg-background transition-all duration-300",
-        isMobile ? "h-full" : "h-screen fixed left-0 top-0 z-40",
-        isCollapsed ? "w-16" : "w-64"
+        'flex flex-col border-r bg-background transition-all duration-300',
+        isMobile ? 'h-full' : 'h-screen fixed left-0 top-0 z-40',
+        isCollapsed ? 'w-16' : 'w-64'
       )}
     >
       <div
         className={cn(
-          "flex items-center h-16 border-b px-4",
-          isCollapsed ? "justify-center" : "justify-between"
+          'flex items-center h-16 border-b px-4',
+          isCollapsed ? 'justify-center' : 'justify-between'
         )}
       >
         {!isCollapsed && (
@@ -144,18 +138,18 @@ export function Sidebar({ isMobile = false }: SidebarProps) {
               key={route.href}
               href={route.href}
               className={cn(
-                "flex items-center rounded-lg py-3 px-3 text-sm font-medium transition-colors",
+                'flex items-center rounded-lg py-3 px-3 text-sm font-medium transition-colors',
                 pathname === route.href
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                isCollapsed && "justify-center px-0"
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                isCollapsed && 'justify-center px-0'
               )}
             >
               <route.icon
                 className={cn(
-                  "h-5 w-5",
+                  'h-5 w-5',
                   route.color,
-                  isCollapsed ? "mr-0" : "mr-3"
+                  isCollapsed ? 'mr-0' : 'mr-3'
                 )}
               />
               {!isCollapsed && <span>{route.label}</span>}
