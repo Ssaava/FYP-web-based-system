@@ -3,6 +3,7 @@ import { Header } from "@/components/common/Header";
 import { Sidebar } from "@/components/common/Sidebar";
 import { useSidebar } from "@/components/SidebarProvider";
 import { ReactNode } from "react";
+import Head from "next/head";
 
 export default function DashboardLayout({
   children,
@@ -12,6 +13,11 @@ export default function DashboardLayout({
   const { collapsed } = useSidebar();
 
   return (
+    <>
+    <Head>
+        <title>Dashboard</title>
+      </Head>
+  
     <div className="relative flex min-h-screen">
       <div className="hidden md:block">
         <Sidebar />
@@ -25,5 +31,6 @@ export default function DashboardLayout({
         <main className="flex-1">{children}</main>
       </div>
     </div>
+    </>
   );
 }
