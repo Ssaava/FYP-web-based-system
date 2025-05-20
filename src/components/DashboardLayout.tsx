@@ -21,7 +21,7 @@ export default function DashboardLayout({
     <Head>
         <title>Dashboard</title>
       </Head>
-      
+
     <div className="relative flex min-h-screen">
       <div className="hidden md:block">
         <Sidebar />
