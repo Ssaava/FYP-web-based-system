@@ -32,7 +32,7 @@ export default function DashboardLayout({
         }`}
       >
         <Header />
-        <main className="flex-1">{children}</main>
+        <main role="main" className="flex-1">{children}</main>
       </div>
     </div>
     </>
