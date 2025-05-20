@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/proxy/:path*", // You call /proxy/xyz
+  //       destination: "http://1581-102-134-149-100.ngrok-free.app/:path*",
+  //     },
+  //   ];
+  // },
 };
 
 // mergeConfig(nextConfig, userConfig);
