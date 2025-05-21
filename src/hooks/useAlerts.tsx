@@ -90,7 +90,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         title: `${ph < 6.5 ? "Low" : "High"} pH Level Detected`,
         description: `pH level ${
           ph < 6.5 ? "below" : "exceeded"
-        } normal range (${ph})`,
+        } normal range (${ph.toFixed(0)})`,
         timestamp: "Just now",
         type: "warning",
         read: false,
@@ -99,17 +99,21 @@ export function AlertProvider({ children }: { children: ReactNode }) {
       showAlert(
         "warning",
         `${ph < 6.5 ? "Low" : "High"} pH Level Detected`,
-        `pH level ${ph < 6.5 ? "below" : "exceeded"} normal range (${ph})`
+        `pH level ${ph < 6.5 ? "below" : "exceeded"} normal range (${ph.toFixed(
+          0
+        )})`
       );
       setLastNotifiedValues((prev) => ({ ...prev, ph }));
     }
 
     // Check turbidity levels (threshold: > 5 NTU)
-    if (turbidity !== lastNotifiedValues.turbidity && turbidity > 5) {
+    if (turbidity !== lastNotifiedValues.turbidity && turbidity > 4.5) {
       newNotifications.push({
         id: Date.now() + 2,
         title: "High Turbidity Alert",
-        description: `Turbidity levels above threshold (${turbidity} NTU)`,
+        description: `Turbidity levels above threshold (${turbidity.toFixed(
+          0
+        )} NTU)`,
         timestamp: "Just now",
         type: "warning",
         read: false,
@@ -117,7 +121,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
       showAlert(
         "warning",
         "High Turbidity Alert",
-        `Turbidity levels above threshold (${turbidity} NTU)`
+        `Turbidity levels above threshold (${turbidity.toFixed(0)} NTU)`
       );
       setLastNotifiedValues((prev) => ({ ...prev, turbidity }));
     }
@@ -132,7 +136,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         title: `${temperature < 20 ? "Low" : "High"} Temperature Alert`,
         description: `Temperature ${
           temperature < 20 ? "below" : "above"
-        } normal range (${temperature}°C)`,
+        } normal range (${temperature.toFixed(0)}°C)`,
         timestamp: "Just now",
         type: "warning",
         read: false,
@@ -143,7 +147,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         `${temperature < 20 ? "Low" : "High"} Temperature Alert`,
         `Temperature ${
           temperature < 20 ? "below" : "above"
-        } normal range (${temperature}°C)`
+        } normal range (${temperature.toFixed(2)}°C)`
       );
       setLastNotifiedValues((prev) => ({ ...prev, temperature }));
     }
@@ -162,7 +166,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         title: `${conductivity < 50 ? "Low" : "High"} Conductivity Alert`,
         description: `Conductivity ${
           conductivity < 50 ? "below" : "above"
-        } normal range (${conductivity}ppm)`,
+        } normal range (${conductivity.toFixed(0)}ppm)`,
         timestamp: "Just now",
         type: "warning",
         read: false,
@@ -173,7 +177,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         `${conductivity < 50 ? "Low" : "High"} Conductivity Alert`,
         `Conductivity ${
           conductivity < 50 ? "below" : "above"
-        } normal range (${conductivity}ppm)`
+        } normal range (${conductivity.toFixed(0)}ppm)`
       );
       setLastNotifiedValues((prev) => ({ ...prev, conductivity }));
     }

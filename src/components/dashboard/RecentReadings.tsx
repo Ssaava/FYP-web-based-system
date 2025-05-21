@@ -28,7 +28,9 @@ interface RecentReadingsProps {
 
 export function RecentReadings({ readings }: RecentReadingsProps) {
   if (!readings || readings.length === 0) {
-    return <p className="text-muted-foreground">No recent readings available.</p>;
+    return (
+      <p className="text-muted-foreground">No recent readings available.</p>
+    );
   }
 
   // Display a limited number of recent readings, e.g., the latest 10
@@ -43,20 +45,24 @@ export function RecentReadings({ readings }: RecentReadingsProps) {
             <TableHead>pH</TableHead>
             <TableHead>Temp (°C)</TableHead>
             <TableHead>Turbidity (NTU)</TableHead>
-            <TableHead>Conductivity (µS/cm)</TableHead>
+            <TableHead>Conductivity (ppm)</TableHead>
             <TableHead>Potability</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {displayReadings.map((reading, index) => (
-            <TableRow key={reading.timestamp + index}> {/* Ensure unique key */}
-              <TableCell className="font-medium">{reading.formattedTimestamp}</TableCell>
+            <TableRow key={reading.timestamp + index}>
+              {" "}
+              {/* Ensure unique key */}
+              <TableCell className="font-medium">
+                {reading.formattedTimestamp}
+              </TableCell>
               <TableCell>{reading.ph.toFixed(1)}</TableCell>
               <TableCell>{reading.temperature.toFixed(1)}</TableCell>
               <TableCell>{reading.turbidity.toFixed(2)}</TableCell>
               <TableCell>{reading.conductivity.toFixed(0)}</TableCell>
               <TableCell>
-                {reading.predictedPotability === 1 ? (
+                {reading.predictedPotability >= 0.65 ? (
                   <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">
                     Potable
                   </span>
