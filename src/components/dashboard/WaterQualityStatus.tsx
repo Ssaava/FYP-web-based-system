@@ -47,7 +47,7 @@ export function WaterQualityStatus({ reading }: WaterQualityStatusProps) {
 
   const isPotable = reading.predictedPotability === 1;
   const overallStatus: "safe" | "danger" = isPotable ? "safe" : "danger";
-  const score = reading.predictedPotability * 100; // Example score based on potability
+  const score = (reading.predictedPotability * 100).toFixed(0); // Example score based on potability
 
   // Example: Define normal ranges for parameters for more detailed status
   // These are illustrative and should be adjusted to actual standards
