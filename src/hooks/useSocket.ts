@@ -1,8 +1,8 @@
 // hooks/useSocket.ts
 import { useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+// import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL; // Use your Flask server URL here
+// const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL; // Use your Flask server URL here
 
 interface ApiReading {
   Conductivity: number;
@@ -26,9 +26,6 @@ export interface ProcessedReading {
 }
 
 export const useSocket = () => {
-  const socketRef = useRef<Socket | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
-
   const [allReadings, setAllReadings] = useState<ProcessedReading[]>([]);
   const [latestReading, setLatestReading] = useState<ProcessedReading | null>(
     null
@@ -87,36 +84,41 @@ export const useSocket = () => {
       }
     };
 
-    socketRef.current = io(SOCKET_URL);
+    // socketRef.current = io(SOCKET_URL);
 
-    socketRef.current.on("connect", () => {
-      fetchData(); //initial fetching of data
-      console.log("Connected to WebSocket server");
-    });
+    // socketRef.current.on("connect", () => {
+    fetchData(); //initial fetching of data
+    // console.log("Connected to WebSocket server");
+    // });
 
-    socketRef.current.on("new_data", (data) => {
-      console.log("Message from server:", data);
+    // socketRef.current.on("new_data", (data) => {
+    //   console.log("Message from server:", data);
+    //   fetchData();
+    //   setMessages((prev) => [...prev, data]);
+    // });
+
+    setInterval(() => {
+      console.log("Fetching Data: ", allReadings);
       fetchData();
-      setMessages((prev) => [...prev, data]);
-    });
+    }, 5000);
 
-    socketRef.current.on("response", (data) => {
-      console.log("Response from server:", data);
-      fetchData();
-      setMessages((prev) => [...prev, data]);
-    });
+    // socketRef.current.on("response", (data) => {
+    //   console.log("Response from server:", data);
+    //   fetchData();
+    //   setMessages((prev) => [...prev, data]);
+    // });
 
-    return () => {
-      socketRef.current?.disconnect();
-    };
+    // return () => {
+    //   socketRef.current?.disconnect();
+    // };
   }, []);
 
-  const sendMessage = (data: any) => {
-    socketRef.current?.emit("my_event", data);
-  };
+  // const sendMessage = (data: any) => {
+  //   socketRef.current?.emit("my_event", data);
+  // };
   useEffect(() => {
     console.log("Latest Reading Updated:", latestReading);
   }, [latestReading]);
 
-  return { messages, sendMessage, loading, error, allReadings, latestReading };
+  return { loading, error, allReadings, latestReading };
 };
