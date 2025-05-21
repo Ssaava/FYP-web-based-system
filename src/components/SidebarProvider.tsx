@@ -10,7 +10,9 @@ type SidebarContextType = {
 
 const SidebarContext = createContext<SidebarContextType>({
   collapsed: false,
-  setCollapsed: () => {},
+  setCollapsed: () => {
+    console.warn("setCollapsed called outside of SidebarProvider");
+  },
 });
 
 // Create a hook to use the sidebar context
