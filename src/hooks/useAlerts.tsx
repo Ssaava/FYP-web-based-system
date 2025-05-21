@@ -7,6 +7,8 @@ import {
   useEffect,
   type ReactNode,
   useCallback,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import { AlertToast } from "@/components/common/AlertToast";
 import { useSocket } from "./useSocket";
@@ -39,6 +41,7 @@ interface AlertContextType {
   notificationsList: NotificationList[];
   showAlert: (type: AlertType, title: string, description: string) => void;
   dismissAlert: (id: string) => void;
+  setNotificationsList: Dispatch<SetStateAction<NotificationList[]>>;
 }
 
 const AlertContext = createContext<AlertContextType | undefined>(undefined);
@@ -182,7 +185,13 @@ export function AlertProvider({ children }: { children: ReactNode }) {
 
   return (
     <AlertContext.Provider
-      value={{ alerts, showAlert, dismissAlert, notificationsList }}
+      value={{
+        alerts,
+        showAlert,
+        dismissAlert,
+        notificationsList,
+        setNotificationsList,
+      }}
     >
       {children}
       <div className="relative">

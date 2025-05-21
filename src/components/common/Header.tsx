@@ -19,6 +19,7 @@ import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuthStore } from "@/store/store";
 import Link from "next/link";
+import { useAlerts } from "@/hooks/useAlerts";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -36,7 +37,9 @@ const pageTitles: Record<string, string> = {
 export function Header() {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3);
+
+  const { notificationsList, setNotificationsList } = useAlerts();
+  const notificationCount = notificationsList.length;
 
   const logoutUser = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
@@ -44,7 +47,6 @@ export function Header() {
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
     if (!showNotifications) {
-      setNotificationCount(0);
     }
   };
 
@@ -88,7 +90,12 @@ export function Header() {
           </Button>
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 z-50">
-              <NotificationsPanel onClose={() => setShowNotifications(false)} />
+              <NotificationsPanel
+                onClose={() => {
+                  setShowNotifications(false);
+                  setNotificationsList([]);
+                }}
+              />
             </div>
           )}
         </div>
