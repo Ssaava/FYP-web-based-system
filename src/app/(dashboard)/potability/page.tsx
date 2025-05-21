@@ -37,7 +37,8 @@ export interface PotabilityHistoryEntry {
 // --- END OF TYPE DEFINITIONS ---
 
 export default function PotabilityPage() {
-  const [assessmentData, setAssessmentData] = useState<PotabilityAssessmentData | null>(null);
+  const [assessmentData, setAssessmentData] =
+    useState<PotabilityAssessmentData | null>(null);
   const [historyData, setHistoryData] = useState<PotabilityHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,10 +50,17 @@ export default function PotabilityPage() {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-        const response = await fetch(`${baseUrl}/api/ml_model`, { method: 'POST' });
+        const response = await fetch(`${baseUrl}/api/ml_model`, {
+          method: "POST",
+        });
         if (!response.ok) {
-          const errData = await response.json().catch(() => ({error: "Failed to parse error from /ml_model"}));
-          throw new Error(errData.error || `Failed to fetch potability data (${response.status})`);
+          const errData = await response
+            .json()
+            .catch(() => ({ error: "Failed to parse error from /ml_model" }));
+          throw new Error(
+            errData.error ||
+              `Failed to fetch potability data (${response.status})`
+          );
         }
         const rawReadings: MlModelApiReading[] = await response.json();
 
@@ -63,24 +71,32 @@ export default function PotabilityPage() {
         }
 
         // Sort by timestamp descending to easily get the latest
-        const sortedReadings = rawReadings.sort((a, b) => new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime());
+        const sortedReadings = rawReadings.sort(
+          (a, b) =>
+            new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
+        );
         const latestReading = sortedReadings[0] || null;
 
         // --- Process for PotabilityAssessment ---
         // Calculate average potability from all readings
-        const potabilityValues = sortedReadings.map(r => r.predicted_potability);
-        const averagePotability = potabilityValues.reduce((sum, val) => sum + val, 0) / (potabilityValues.length || 1);
+        const potabilityValues = sortedReadings.map(
+          (r) => r.predicted_potability
+        );
+        const averagePotability =
+          potabilityValues.reduce((sum, val) => sum + val, 0) /
+          (potabilityValues.length || 1);
         const potabilityScore = Math.round(averagePotability * 100); // As percentage
 
         let currentStatus: "safe" | "warning" | "unsafe";
-        if (potabilityScore >= 75) { // Example thresholds
+        if (potabilityScore >= 75) {
+          // Example thresholds
           currentStatus = "safe";
         } else if (potabilityScore >= 50) {
           currentStatus = "warning";
         } else {
           currentStatus = "unsafe";
         }
-        
+
         setAssessmentData({
           potabilityScore,
           status: currentStatus,
@@ -88,18 +104,23 @@ export default function PotabilityPage() {
         });
 
         // --- Process for PotabilityHistory ---
-        const newHistoryData: PotabilityHistoryEntry[] = sortedReadings.map(reading => {
-          const readingTimestamp = new Date(reading.Timestamp).getTime();
-          return {
-            // Example: "5/7/2025"
-            date: new Date(reading.Timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric'}),
-            timestamp: readingTimestamp,
-            score: reading.predicted_potability === 1 ? 100 : 0, // Convert 0/1 to 0/100 for score
-            status: reading.predicted_potability === 1 ? "safe" : "unsafe",
-          };
-        });
+        const newHistoryData: PotabilityHistoryEntry[] = sortedReadings.map(
+          (reading) => {
+            const readingTimestamp = new Date(reading.Timestamp).getTime();
+            return {
+              // Example: "5/7/2025"
+              date: new Date(reading.Timestamp).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              }),
+              timestamp: readingTimestamp,
+              score: reading.predicted_potability >= 0.65 ? 100 : 0, // Convert 0/1 to 0/100 for score
+              status: reading.predicted_potability >= 0.65 ? "safe" : "unsafe",
+            };
+          }
+        );
         setHistoryData(newHistoryData);
-
       } catch (err: any) {
         console.error("Error on Potability Page:", err);
         setError(err.message || "An unknown error occurred.");
@@ -127,22 +148,35 @@ export default function PotabilityPage() {
         </div>
       </div>
 
-      {isLoading && <p className="text-center p-10 text-muted-foreground">Loading potability data...</p>}
+      {isLoading && (
+        <p className="text-center p-10 text-muted-foreground">
+          Loading potability data...
+        </p>
+      )}
       {error && (
         <Card className="border-destructive bg-destructive/10">
-          <CardHeader><CardTitle className="text-destructive">Error Loading Data</CardTitle></CardHeader>
-          <CardContent><p className="text-destructive-foreground">{error}</p></CardContent>
+          <CardHeader>
+            <CardTitle className="text-destructive">
+              Error Loading Data
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-destructive-foreground">{error}</p>
+          </CardContent>
         </Card>
       )}
 
       {!isLoading && !error && assessmentData && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="lg:col-span-2 col-span-1 md:col-span-full"> {/* PotabilityAssessment takes more space */}
+            <Card className="lg:col-span-2 col-span-1 md:col-span-full">
+              {" "}
+              {/* PotabilityAssessment takes more space */}
               <CardHeader>
                 <CardTitle>Current Potability Assessment</CardTitle>
                 <CardDescription>
-                  Overall evaluation based on recent historical data average and latest parameters
+                  Overall evaluation based on recent historical data average and
+                  latest parameters
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -176,12 +210,18 @@ export default function PotabilityPage() {
           </Card>
         </>
       )}
-       {!isLoading && !error && !assessmentData && (
-         <Card>
-          <CardHeader><CardTitle>No Data</CardTitle></CardHeader>
-          <CardContent><p className="text-muted-foreground">No potability data is currently available.</p></CardContent>
+      {!isLoading && !error && !assessmentData && (
+        <Card>
+          <CardHeader>
+            <CardTitle>No Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              No potability data is currently available.
+            </p>
+          </CardContent>
         </Card>
-       )}
+      )}
     </div>
   );
 }

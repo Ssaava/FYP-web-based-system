@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 // Assuming ProcessedReading is imported from a shared types file or DashboardPage
 interface ProcessedReading {
   ph: number;
@@ -45,7 +45,7 @@ export function WaterQualityStatus({ reading }: WaterQualityStatusProps) {
     );
   }
 
-  const isPotable = reading.predictedPotability === 1;
+  const isPotable = reading.predictedPotability >= 0.65;
   const overallStatus: "safe" | "danger" = isPotable ? "safe" : "danger";
   const score = (reading.predictedPotability * 100).toFixed(0); // Example score based on potability
 
@@ -95,7 +95,7 @@ export function WaterQualityStatus({ reading }: WaterQualityStatusProps) {
           </span>
         </div>
         <Progress
-          value={score}
+          value={Number(score)}
           className={`h-2 ${
             isPotable ? "[&>div]:bg-green-500" : "[&>div]:bg-red-500"
           }`}

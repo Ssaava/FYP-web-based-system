@@ -62,7 +62,7 @@ export function RecentReadings({ readings }: RecentReadingsProps) {
               <TableCell>{reading.turbidity.toFixed(2)}</TableCell>
               <TableCell>{reading.conductivity.toFixed(0)}</TableCell>
               <TableCell>
-                {reading.predictedPotability === 1 ? (
+                {reading.predictedPotability >= 0.65 ? (
                   <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">
                     Potable
                   </span>
