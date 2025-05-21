@@ -116,9 +116,6 @@ export const useSocket = () => {
   // const sendMessage = (data: any) => {
   //   socketRef.current?.emit("my_event", data);
   // };
-  useEffect(() => {
-    console.log("Latest Reading Updated:", latestReading);
-  }, [latestReading]);
 
   return { loading, error, allReadings, latestReading };
 };
