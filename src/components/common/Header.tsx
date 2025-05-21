@@ -35,21 +35,11 @@ const pageTitles: Record<string, string> = {
 
 export function Header() {
   const pathname = usePathname();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
   const logoutUser = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
-
-  // this eventHandler will fetch the data from the server to refresh page
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    // Simulate refresh
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1000);
-  };
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
@@ -77,26 +67,9 @@ export function Header() {
         </Sheet>
 
         <h1 className="text-xl font-semibold">{pageTitle}</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="ml-2"
-        >
-          <RefreshCw
-            className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-          />
-          <span className="sr-only">Refresh</span>
-        </Button>
       </div>
       <h1 className="font-bold text-lg">Sensor Information</h1>
       <div className="flex items-center gap-2 md:gap-4">
-        {/* <div className="relative hidden md:block">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input type="search" placeholder="Search..." className="w-[200px] lg:w-[300px] pl-8" />
-        </div> */}
-
         <ThemeToggle />
 
         <div className="relative">

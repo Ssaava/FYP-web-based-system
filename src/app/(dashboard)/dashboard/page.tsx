@@ -93,7 +93,7 @@ export default function DashboardPage() {
                 : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Target: &lt; 500 µS/cm
+              Target: &lt; 2000 ppm
             </p>
           </CardContent>
         </Card>

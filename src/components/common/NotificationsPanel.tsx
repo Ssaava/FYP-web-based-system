@@ -1,8 +1,9 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { useAlerts } from "@/hooks/useAlerts";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface NotificationsPanelProps {
   onClose: () => void;
@@ -44,6 +45,8 @@ const notifications = [
 ];
 
 export function NotificationsPanel({ onClose }: NotificationsPanelProps) {
+  const { notificationsList } = useAlerts();
+
   return (
     <Card className="shadow-lg border">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
@@ -55,7 +58,7 @@ export function NotificationsPanel({ onClose }: NotificationsPanelProps) {
       <CardContent className="p-0">
         <ScrollArea className="h-[400px]">
           <div className="flex flex-col">
-            {notifications.map((notification) => (
+            {notificationsList.map((notification) => (
               <div
                 key={notification.id}
                 className={`flex items-start p-4 border-b hover:bg-muted/50 transition-colors ${
@@ -88,10 +91,10 @@ export function NotificationsPanel({ onClose }: NotificationsPanelProps) {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {notification.description}
+                    {notification?.description}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {notification.timestamp}
+                    {notification?.timestamp}
                   </p>
                 </div>
               </div>
