@@ -38,7 +38,7 @@ export function Header() {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const { notificationsList } = useAlerts();
+  const { notificationsList, setNotificationsList } = useAlerts();
   const notificationCount = notificationsList.length;
 
   const logoutUser = useAuthStore((state) => state.logout);
@@ -90,7 +90,12 @@ export function Header() {
           </Button>
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 z-50">
-              <NotificationsPanel onClose={() => setShowNotifications(false)} />
+              <NotificationsPanel
+                onClose={() => {
+                  setShowNotifications(false);
+                  setNotificationsList([]);
+                }}
+              />
             </div>
           )}
         </div>
