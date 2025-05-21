@@ -74,20 +74,6 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     setAlerts((prev) => prev.filter((alert) => alert.id !== id));
   }, []);
 
-  // Example of triggering alerts based on water quality thresholds
-  useEffect(() => {
-    // Simulate a pH level alert after 3 seconds
-    const timer = setTimeout(() => {
-      showAlert(
-        "warning",
-        "High pH Level Detected",
-        "pH level has exceeded the normal range (8.5). Please check the system."
-      );
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [showAlert]);
-
   useEffect(() => {
     if (!latestReading) return;
 
